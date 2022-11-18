@@ -1,5 +1,4 @@
-import web3 from "web3";
-import { Web3Lib } from "./lib/Web3Lib";
+import Web3Lib from "./lib/Web3Lib";
 import cron from "node-cron";
 
 class WebLib {

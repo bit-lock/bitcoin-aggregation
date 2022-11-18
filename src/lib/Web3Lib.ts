@@ -6,6 +6,7 @@ import { Signatories } from "./models/Signatories";
 class Web3Lib {
   private web3: Web3;
   private contract: any;
+  private static instance: Web3Lib;
 
   constructor() {
     this.web3 = new Web3("https://goerli.infura.io/v3/bb8c81af0ae0446f9652ca3b3ffdf2b1");
@@ -16,6 +17,14 @@ class Web3Lib {
   private initContract = () => {
     this.contract = new this.web3.eth.Contract(BtcVault.abi as any, BtcVault.address);
   };
+
+  public static getInstance(): Web3Lib {
+    if (!Web3Lib.instance) {
+      Web3Lib.instance = new Web3Lib();
+    }
+
+    return Web3Lib.instance;
+  }
 
   getVaultLength = async (): Promise<number> => {
     return this.contract.methods.getVaultLength().call();

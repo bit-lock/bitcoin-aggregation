@@ -23,8 +23,8 @@ class WebLib {
 }
 
 cron.schedule("* * * * * *", async () => {
-  const bisey = new WebLib();
-  const instance = bisey.getLib();
+  const currentInstance = new WebLib();
+  const instance = currentInstance.getLib();
   instance.getVaultLength();
   console.log(await instance.getVaultLength());
 });

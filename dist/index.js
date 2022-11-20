@@ -13,6 +13,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Web3Lib_1 = __importDefault(require("./lib/Web3Lib"));
+const headerTemplate_1 = require("./lib/bitcoin/headerTemplate");
+const utils_1 = require("./lib/bitcoin/utils");
+const outputs_1 = require("./templates/outputs");
+const utils_2 = require("./lib/utils");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
     const vaultLength = yield instance.getVaultLength();
@@ -22,6 +26,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         if (vault.status === "0x01") {
             const signatories = yield instance.getSignatories(i);
             const nextProposalId = yield instance.nextProposalId(vaultId);
+            const { address, script } = (0, headerTemplate_1.bitcoinTemplateMaker)(Number(vault.threshold), signatories);
+            const minimumSignatoryCount = (0, utils_2.calculateSignCount)(vault, signatories);
+            const utxos = yield (0, utils_1.fetchUtxos)(address);
             let propsalIds = [];
             if (nextProposalId > 0) {
                 for (let z = 0; z < nextProposalId; z++) {
@@ -41,7 +48,11 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 const withdrawRequestSigs = yield Promise.all(getWithdrawRequestSigs);
                 //
                 const signatoriesNumber = signatories[1].map((sg) => Number(sg));
-                console.log(signatoriesNumber.sort((a, b) => b - a));
+                // console.log(signatoriesNumber.sort((a, b) => b - a));
+                // console.log(withdrawRequests);
+                // console.log(withdrawRequestSigs);
+                // console.log(inputTemplate(utxos));
+                console.log(yield (0, outputs_1.outputTemplate)(utxos, Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, minimumSignatoryCount, script, address));
             }
         }
     }

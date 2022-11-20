@@ -40,9 +40,7 @@ const bs58_1 = require("bs58");
 // @ts-ignore
 const segwit_addr_ecc_1 = __importDefault(require("./bech32/segwit_addr_ecc"));
 const recomommendedFee = () => __awaiter(void 0, void 0, void 0, function* () {
-    return axios_1.default
-        .get("https://mempool.space/api/v1/fees/recommended")
-        .then((response) => {
+    return axios_1.default.get("https://mempool.space/api/v1/fees/recommended").then((response) => {
         return response.data;
     });
 });
@@ -77,7 +75,7 @@ const fetchUtxos = (address) => __awaiter(void 0, void 0, void 0, function* () {
                             if (tx.vout[us].scriptpubkey_address === address) {
                                 myUtxoSets.push({
                                     txId: tx.txid,
-                                    vout: us,
+                                    vout: lib_core_1.convertion.convert32(wiz_data_1.default.fromNumber(us)).hex,
                                     value: (tx.vout[us].value || 0) / 100000000,
                                 });
                             }
@@ -87,8 +85,7 @@ const fetchUtxos = (address) => __awaiter(void 0, void 0, void 0, function* () {
             });
             const myFinalUtxos = myUtxoSets.map((value, index) => {
                 return {
-                    data: lib_core_1.crypto.sha256v2(wiz_data_1.default.fromHex(value.txId +
-                        lib_core_1.convertion.convert32(wiz_data_1.default.fromNumber(value.vout)).hex)),
+                    data: lib_core_1.crypto.sha256v2(wiz_data_1.default.fromHex(value.txId + value.vout)),
                     index,
                 };
             });
@@ -104,20 +101,14 @@ const calculateTxFees = (utxos, minimumSignatoryCount, template) => __awaiter(vo
     const totalUtxoCount = utxos.length;
     const templateByteSize = wiz_data_1.default.fromHex(template).bytes.byteLength;
     const fee = yield recomommendedFee();
-    const formula = (40 * totalUtxoCount +
-        16 * totalUtxoCount * minimumSignatoryCount +
-        10 +
-        8 +
-        (templateByteSize * totalUtxoCount) / 4 +
-        87) *
-        fee.fastestFee;
+    const formula = (40 * totalUtxoCount + 16 * totalUtxoCount * minimumSignatoryCount + 10 + 8 + (templateByteSize * totalUtxoCount) / 4 + 87) * fee.fastestFee;
     return Math.round(formula);
 });
 exports.calculateTxFees = calculateTxFees;
 const createDestinationPubkey = (destinationAddress) => {
     if (destinationAddress === "")
         return { errorMessage: "", scriptPubkey: "" };
-    const res = segwit_addr_ecc_1.default.check(destinationAddress, ["bc", "tb"]);
+    const res = segwit_addr_ecc_1.default.check2(destinationAddress, ["bc", "tb"]);
     let scriptPubkey = "";
     try {
         if (res.program) {
@@ -134,19 +125,15 @@ const createDestinationPubkey = (destinationAddress) => {
             if (data.byteLength === 25) {
                 const editedData = data.slice(1, 21);
                 const validData = data.slice(0, 21);
-                const editedDataDoubleHash = lib_core_1.crypto
-                    .hash256(wiz_data_1.default.fromBytes(validData))
-                    .toString();
+                const editedDataDoubleHash = lib_core_1.crypto.hash256(wiz_data_1.default.fromBytes(validData)).toString();
                 const doubleHashFirst4Byte = editedDataDoubleHash.substring(0, 8);
                 const dataLast4byte = Buffer.from(data.slice(21)).toString("hex");
                 if (doubleHashFirst4Byte === dataLast4byte) {
                     if (data[0] === 111 || data[0] === 0) {
-                        scriptPubkey =
-                            "76a914" + Buffer.from(editedData).toString("hex") + "88ac";
+                        scriptPubkey = "76a914" + Buffer.from(editedData).toString("hex") + "88ac";
                     }
                     else if (data[0] === 196 || data[0] === 5) {
-                        scriptPubkey =
-                            "a914" + Buffer.from(editedData).toString("hex") + "87";
+                        scriptPubkey = "a914" + Buffer.from(editedData).toString("hex") + "87";
                     }
                     else {
                         return { errorMessage: "Invalid address", scriptPubkey: "" };
@@ -181,10 +168,7 @@ const lexicographical = (aTx, bTx) => {
         throw new Error("Lexicographical error. Wrong length tx ids: " + aTx + "," + bTx);
     const a = (0, wiz_data_1.hexLE)(aTx.substring(48));
     const b = (0, wiz_data_1.hexLE)(bTx.substring(48));
-    return lib_core_1.arithmetics64.greaterThan64(wiz_data_1.default.fromHex(a), wiz_data_1.default.fromHex(b))
-        .number === 1
-        ? 1
-        : -1;
+    return lib_core_1.arithmetics64.greaterThan64(wiz_data_1.default.fromHex(a), wiz_data_1.default.fromHex(b)).number === 1 ? 1 : -1;
 };
 exports.lexicographical = lexicographical;
 const convertTo35Byte = (hex) => {

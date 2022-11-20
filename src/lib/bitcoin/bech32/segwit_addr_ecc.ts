@@ -22,11 +22,7 @@
 
 var bech32_ecc = require("./bech32_ecc");
 
-module.exports = {
-  check: check,
-};
-
-function convertbits(data, frombits, tobits, pad) {
+function convertbits(data: string | any[], frombits: number, tobits: number, pad: boolean) {
   var acc = 0;
   var bits = 0;
   var ret = [];
@@ -53,14 +49,14 @@ function convertbits(data, frombits, tobits, pad) {
   return ret;
 }
 
-function check(addr, validHrp) {
+function check2(addr: string | any[], validHrp: any) {
   if (addr.length < 14) {
     return { error: "Too short", pos: null };
   }
   if (addr.length > 74) {
     return { error: "Too long", pos: null };
   }
-  eposs = [];
+  let eposs = [];
   for (var encname in bech32_ecc.encodings) {
     const encoding = bech32_ecc.encodings[encname];
     var dec = bech32_ecc.check(addr, validHrp, encoding);
@@ -110,7 +106,7 @@ function check(addr, validHrp) {
     return { error: "Checksum error", pos: eposs[0] };
   }
   if (eposs.length > 1) {
-    eposs.sort(function (a, b) {
+    eposs.sort(function (a: string | any[], b: string | any[]) {
       return a.length - b.length;
     });
     if (eposs[0].length < eposs[1].length) {
@@ -119,3 +115,7 @@ function check(addr, validHrp) {
   }
   return { error: "Checksum error", pos: null };
 }
+
+module.exports = {
+  check2: check2,
+};

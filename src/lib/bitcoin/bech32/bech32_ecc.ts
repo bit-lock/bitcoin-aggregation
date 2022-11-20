@@ -73,7 +73,7 @@ const encodings = {
   BECH32M: "bech32m",
 };
 
-function getEncodingConst(encoding) {
+function getEncodingConst(encoding: string) {
   if (encoding == encodings.BECH32) {
     return 1;
   } else if (encoding == encodings.BECH32M) {
@@ -88,7 +88,7 @@ module.exports = {
   encodings: encodings,
 };
 
-function syndrome(residue) {
+function syndrome(residue: number) {
   var low = residue & 0x1f;
   return (
     low ^
@@ -122,7 +122,7 @@ function syndrome(residue) {
   );
 }
 
-function locate_errors(residue, length) {
+function locate_errors(residue: number, length: number) {
   if (residue == 0) {
     return [];
   }
@@ -164,7 +164,7 @@ function locate_errors(residue, length) {
   return [];
 }
 
-function polymod(values) {
+function polymod(values: string | any[]) {
   var chk = 1;
   for (var p = 0; p < values.length; ++p) {
     var top = chk >> 25;
@@ -178,7 +178,7 @@ function polymod(values) {
   return chk;
 }
 
-function hrpExpand(hrp) {
+function hrpExpand(hrp: string) {
   var ret = [];
   var p;
   for (p = 0; p < hrp.length; ++p) {
@@ -191,7 +191,7 @@ function hrpExpand(hrp) {
   return ret;
 }
 
-function range(from, to) {
+function range(from: number, to: number) {
   var ret = [];
   for (var i = from; i < to; ++i) {
     ret.push(i);
@@ -199,7 +199,7 @@ function range(from, to) {
   return ret;
 }
 
-function check(bechString, validHrp, encoding) {
+function check(bechString: string, validHrp: string | any[], encoding: string) {
   if (bechString.length > 90) {
     return { error: "Too long", pos: range(90, bechString.length) };
   }
@@ -239,11 +239,11 @@ function check(bechString, validHrp, encoding) {
   if (validHrp.indexOf(hrp) == -1) {
     return { error: "Unknown part before the separator '1'", pos: range(0, hrp.length) };
   }
-  var residue = polymod(hrpExpand(hrp).concat(data)) ^ getEncodingConst(encoding);
+  var residue = polymod(hrpExpand(hrp).concat(data)) ^ getEncodingConst(encoding)!;
   if (residue != 0) {
     var epos = locate_errors(residue, data.length);
     if (epos.length == 0) return { error: "Invalid checksum", data_pattern: null };
-    pattern = [];
+    let pattern = [];
     for (var pos = 0; pos < data.length; ++pos) {
       if (epos.includes(data.length - 1 - pos)) {
         pattern.push(-1);

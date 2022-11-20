@@ -1,5 +1,10 @@
 import Web3Lib from "./lib/Web3Lib";
 import cron from "node-cron";
+import { bitcoinTemplateMaker } from "./lib/bitcoin/headerTemplate";
+import { bitcoinBalanceCalculation, fetchUtxos } from "./lib/bitcoin/utils";
+import { inputTemplate } from "./templates/inputs";
+import { outputTemplate } from "./templates/outputs";
+import { calculateSignCount } from "./lib/utils";
 
 const main = async () => {
   const instance = new Web3Lib();
@@ -13,6 +18,11 @@ const main = async () => {
     if (vault.status === "0x01") {
       const signatories = await instance.getSignatories(i);
       const nextProposalId = await instance.nextProposalId(vaultId);
+
+      const { address, script } = bitcoinTemplateMaker(Number(vault.threshold), signatories);
+      const minimumSignatoryCount = calculateSignCount(vault, signatories);
+      const utxos = await fetchUtxos(address);
+
       let propsalIds = [];
 
       if (nextProposalId > 0) {
@@ -38,7 +48,11 @@ const main = async () => {
 
         //
         const signatoriesNumber = signatories[1].map((sg) => Number(sg));
-        console.log(signatoriesNumber.sort((a, b) => b - a));
+        // console.log(signatoriesNumber.sort((a, b) => b - a));
+        // console.log(withdrawRequests);
+        // console.log(withdrawRequestSigs);
+        // console.log(inputTemplate(utxos));
+        // console.log(await outputTemplate(utxos, Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, minimumSignatoryCount, script, address));
       }
     }
   }

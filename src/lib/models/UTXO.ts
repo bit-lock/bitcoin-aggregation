@@ -1,5 +1,5 @@
 export type UTXO = {
   txId: string;
-  vout: number;
+  vout: string;
   value: number;
 };

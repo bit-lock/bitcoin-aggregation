@@ -10,11 +10,9 @@ import { decode } from "bs58";
 import segwit_addr_ecc from "./bech32/segwit_addr_ecc";
 
 const recomommendedFee = async () => {
-  return axios
-    .get<RecommendedFee>("https://mempool.space/api/v1/fees/recommended")
-    .then((response) => {
-      return response.data;
-    });
+  return axios.get<RecommendedFee>("https://mempool.space/api/v1/fees/recommended").then((response) => {
+    return response.data;
+  });
 };
 
 export const fetchUtxos = async (address: string): Promise<UTXO[]> => {
@@ -54,7 +52,7 @@ export const fetchUtxos = async (address: string): Promise<UTXO[]> => {
               if (tx.vout[us].scriptpubkey_address === address) {
                 myUtxoSets.push({
                   txId: tx.txid,
-                  vout: us,
+                  vout: convertion.convert32(WizData.fromNumber(us)).hex,
                   value: (tx.vout[us].value || 0) / 100000000,
                 });
               }
@@ -65,19 +63,12 @@ export const fetchUtxos = async (address: string): Promise<UTXO[]> => {
 
       const myFinalUtxos = myUtxoSets.map((value, index) => {
         return {
-          data: crypto.sha256v2(
-            WizData.fromHex(
-              value.txId +
-                convertion.convert32(WizData.fromNumber(value.vout)).hex
-            )
-          ),
+          data: crypto.sha256v2(WizData.fromHex(value.txId + value.vout)),
           index,
         };
       });
 
-      const sortedUtxos = myFinalUtxos.sort((a, b) =>
-        lexicographical(a.data, b.data)
-      );
+      const sortedUtxos = myFinalUtxos.sort((a, b) => lexicographical(a.data, b.data));
 
       const finalData = sortedUtxos.map((data) => myUtxoSets[data.index]);
 
@@ -88,30 +79,19 @@ export const fetchUtxos = async (address: string): Promise<UTXO[]> => {
   return myUtxoSets;
 };
 
-export const calculateTxFees = async (
-  utxos: UTXO[],
-  minimumSignatoryCount: number,
-  template: string
-) => {
+export const calculateTxFees = async (utxos: UTXO[], minimumSignatoryCount: number, template: string) => {
   const totalUtxoCount = utxos.length;
   const templateByteSize = WizData.fromHex(template).bytes.byteLength;
   const fee = await recomommendedFee();
 
-  const formula =
-    (40 * totalUtxoCount +
-      16 * totalUtxoCount * minimumSignatoryCount +
-      10 +
-      8 +
-      (templateByteSize * totalUtxoCount) / 4 +
-      87) *
-    fee.fastestFee;
+  const formula = (40 * totalUtxoCount + 16 * totalUtxoCount * minimumSignatoryCount + 10 + 8 + (templateByteSize * totalUtxoCount) / 4 + 87) * fee.fastestFee;
 
   return Math.round(formula);
 };
 
 export const createDestinationPubkey = (destinationAddress: string) => {
   if (destinationAddress === "") return { errorMessage: "", scriptPubkey: "" };
-  const res = segwit_addr_ecc.check(destinationAddress, ["bc", "tb"]);
+  const res = segwit_addr_ecc.check2(destinationAddress, ["bc", "tb"]);
 
   let scriptPubkey = "";
 
@@ -132,19 +112,15 @@ export const createDestinationPubkey = (destinationAddress: string) => {
         const editedData = data.slice(1, 21);
         const validData = data.slice(0, 21);
 
-        const editedDataDoubleHash = crypto
-          .hash256(WizData.fromBytes(validData))
-          .toString();
+        const editedDataDoubleHash = crypto.hash256(WizData.fromBytes(validData)).toString();
         const doubleHashFirst4Byte = editedDataDoubleHash.substring(0, 8);
         const dataLast4byte = Buffer.from(data.slice(21)).toString("hex");
 
         if (doubleHashFirst4Byte === dataLast4byte) {
           if (data[0] === 111 || data[0] === 0) {
-            scriptPubkey =
-              "76a914" + Buffer.from(editedData).toString("hex") + "88ac";
+            scriptPubkey = "76a914" + Buffer.from(editedData).toString("hex") + "88ac";
           } else if (data[0] === 196 || data[0] === 5) {
-            scriptPubkey =
-              "a914" + Buffer.from(editedData).toString("hex") + "87";
+            scriptPubkey = "a914" + Buffer.from(editedData).toString("hex") + "87";
           } else {
             return { errorMessage: "Invalid address", scriptPubkey: "" };
           }
@@ -167,28 +143,19 @@ export const bitcoinBalanceCalculation = (utxos: UTXO[]) => {
     const balances = utxos.map((utxo) => utxo.value);
 
     const initialValue = 0;
-    return balances.reduce(
-      (previousValue, currentValue) => previousValue + currentValue,
-      initialValue
-    );
+    return balances.reduce((previousValue, currentValue) => previousValue + currentValue, initialValue);
   }
 
   return 0;
 };
 
 export const lexicographical = (aTx: string, bTx: string): number => {
-  if (aTx.length !== 64 || bTx.length !== 64)
-    throw new Error(
-      "Lexicographical error. Wrong length tx ids: " + aTx + "," + bTx
-    );
+  if (aTx.length !== 64 || bTx.length !== 64) throw new Error("Lexicographical error. Wrong length tx ids: " + aTx + "," + bTx);
 
   const a = hexLE(aTx.substring(48));
   const b = hexLE(bTx.substring(48));
 
-  return arithmetics64.greaterThan64(WizData.fromHex(a), WizData.fromHex(b))
-    .number === 1
-    ? 1
-    : -1;
+  return arithmetics64.greaterThan64(WizData.fromHex(a), WizData.fromHex(b)).number === 1 ? 1 : -1;
 };
 
 export const convertTo35Byte = (hex: string) => {

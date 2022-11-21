@@ -11,8 +11,8 @@ const witnessTemplate = (signatories, sigs, script) => {
     const degregadingPeriodIndex = lib_core_1.utils.compactSizeVarIntData("01");
     const scriptCompact = lib_core_1.utils.compactSizeVarIntData(script.substring(2));
     const signatury = numberOfWitnessElements +
-        lib_core_1.utils.compactSizeVarIntData(sigs[0][0].substring(2)) +
         lib_core_1.utils.compactSizeVarIntData(sigs[1][0].substring(2)) +
+        lib_core_1.utils.compactSizeVarIntData(sigs[0][0].substring(2)) +
         degregadingPeriodIndex +
         scriptCompact +
         "21" +

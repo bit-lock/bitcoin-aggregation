@@ -24,11 +24,12 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     for (let i = 0; i < vaultLength; i++) {
         const vaultId = i;
         const vault = yield instance.getVaults(vaultId);
-        if (vault.status === "0x01") {
+        if (vault.status === "0x01" && vault.name === "burki") {
             const signatories = yield instance.getSignatories(i);
             const nextProposalId = yield instance.nextProposalId(vaultId);
             const { address, script } = (0, headerTemplate_1.bitcoinTemplateMaker)(Number(vault.threshold), signatories);
             const utxos = yield (0, utils_1.fetchUtxos)(address);
+            const balance = (0, utils_1.bitcoinBalanceCalculation)(utxos);
             let propsalIds = [];
             if (nextProposalId > 0) {
                 for (let z = 0; z < nextProposalId; z++) {
@@ -51,9 +52,13 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 // console.log(withdrawRequestSigs);
                 console.log("ww", withdrawRequests);
                 console.log("withdrawRequestSigs", withdrawRequestSigs);
+                console.log("script", script);
                 const a = (0, inputs_1.inputTemplate)(utxos);
-                const b = (0, outputs_1.outputTemplate)(Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, address, Number(withdrawRequests[0].fee));
+                const b = (0, outputs_1.outputTemplate)(Number(withdrawRequests[0].amount), balance, withdrawRequests[0].scriptPubkey, address, Number(withdrawRequests[0].fee));
                 const c = (0, witness_1.witnessTemplate)(signatories, withdrawRequestSigs, script);
+                console.log("inputs", a);
+                console.log("outputs", b);
+                console.log("witness", c);
                 console.log(a + b + c);
             }
         }

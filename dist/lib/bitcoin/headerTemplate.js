@@ -24,8 +24,10 @@ const noDegradeHeader = (scriptWizard, unlocking_threshold) => {
     scriptWizard.parseOpcode("OP_1", false, "");
     scriptWizard.parseOpcode("OP_EQUAL", false, "");
     scriptWizard.parseOpcode("OP_IF", false, "");
-    scriptWizard.parseOpcode("OP_1", false, "");
+    scriptWizard.parseOpcode("OP_DROP", false, "");
+    scriptWizard.parseOpcode("OP_0", false, "");
     scriptWizard.parseOpcode("OP_CHECKSEQUENCEVERIFY", false, "");
+    scriptWizard.parseOpcode("OP_DROP", false, "");
     scriptWizard.parseNumber(unlocking_threshold, true, "");
     scriptWizard.parseOpcode("OP_TOALTSTACK", false, "");
     scriptWizard.parseOpcode("OP_ELSE", false, "");

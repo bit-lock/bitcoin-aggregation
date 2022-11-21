@@ -7,16 +7,15 @@ exports.outputTemplate = void 0;
 const lib_core_1 = require("@script-wiz/lib-core");
 const wiz_data_1 = __importDefault(require("@script-wiz/wiz-data"));
 const utils_1 = require("../lib/bitcoin/utils");
-const outputTemplate = (amount, destinationScriptPubkey, address, fee) => {
+const outputTemplate = (amount, balance, destinationScriptPubkey, address, fee) => {
     const first = "02";
+    const balanceSats = balance * utils_1.BITCOIN_PER_SATOSHI;
     const amount64 = lib_core_1.convertion.numToLE64(wiz_data_1.default.fromNumber(amount)).hex;
-    console.log("1", destinationScriptPubkey);
     const compactDestinationScriptPubkey = destinationScriptPubkey.substring(2);
-    // const fee = await calculateTxFees(utxo, minimumSignatoryCount, script.substring(2));
-    const changeAmount = lib_core_1.convertion.numToLE64(wiz_data_1.default.fromNumber(fee)).hex;
-    const destinationScriptPubkeyCompact = lib_core_1.utils.compactSizeVarIntData((0, utils_1.createDestinationPubkey)(address).scriptPubkey);
-    console.log("2", destinationScriptPubkeyCompact);
-    return first + amount64 + compactDestinationScriptPubkey + changeAmount + destinationScriptPubkeyCompact;
+    const changeAmountNumber = balanceSats - amount - fee;
+    const changeAmount = lib_core_1.convertion.numToLE64(wiz_data_1.default.fromNumber(changeAmountNumber)).hex;
+    const vaultScriptPubkey = lib_core_1.utils.compactSizeVarIntData((0, utils_1.createDestinationPubkey)(address).scriptPubkey);
+    return first + amount64 + compactDestinationScriptPubkey + changeAmount + vaultScriptPubkey;
 };
 exports.outputTemplate = outputTemplate;
 //# sourceMappingURL=outputs.js.map

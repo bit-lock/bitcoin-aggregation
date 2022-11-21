@@ -8,10 +8,10 @@ export const witnessTemplate = (signatories: Signatories, sigs: string[], script
 
   const scriptCompact = utils.compactSizeVarIntData(script.substring(2));
 
-  const signatury =
+  const signatory =
     numberOfWitnessElements +
-    utils.compactSizeVarIntData(sigs[0][0].substring(2)) +
     utils.compactSizeVarIntData(sigs[1][0].substring(2)) +
+    utils.compactSizeVarIntData(sigs[0][0].substring(2)) +
     degregadingPeriodIndex +
     scriptCompact +
     "21" +
@@ -27,5 +27,5 @@ export const witnessTemplate = (signatories: Signatories, sigs: string[], script
   //   "c1" +
   //   "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624";
 
-  return signatury + "00000000";
+  return signatory + "00000000";
 };

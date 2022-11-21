@@ -1,7 +1,7 @@
 import Web3Lib from "./lib/Web3Lib";
 import cron from "node-cron";
 import { bitcoinTemplateMaker } from "./lib/bitcoin/headerTemplate";
-import { fetchUtxos } from "./lib/bitcoin/utils";
+import { bitcoinBalanceCalculation, fetchUtxos } from "./lib/bitcoin/utils";
 import { inputTemplate } from "./templates/inputs";
 import { outputTemplate } from "./templates/outputs";
 import { witnessTemplate } from "./templates/witness";
@@ -15,13 +15,14 @@ const main = async () => {
     const vaultId = i;
     const vault = await instance.getVaults(vaultId);
 
-    if (vault.status === "0x01") {
+    if (vault.status === "0x01" && vault.name === "burki") {
       const signatories = await instance.getSignatories(i);
       const nextProposalId = await instance.nextProposalId(vaultId);
 
       const { address, script } = bitcoinTemplateMaker(Number(vault.threshold), signatories);
 
       const utxos = await fetchUtxos(address);
+      const balance = bitcoinBalanceCalculation(utxos);
 
       let propsalIds = [];
 
@@ -53,10 +54,15 @@ const main = async () => {
         console.log("ww", withdrawRequests);
         console.log("withdrawRequestSigs", withdrawRequestSigs);
 
+        console.log("script", script);
+
         const a = inputTemplate(utxos);
-        const b = outputTemplate(Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, address, Number(withdrawRequests[0].fee));
+        const b = outputTemplate(Number(withdrawRequests[0].amount), balance, withdrawRequests[0].scriptPubkey, address, Number(withdrawRequests[0].fee));
         const c = witnessTemplate(signatories, withdrawRequestSigs, script);
 
+        console.log("inputs", a);
+        console.log("outputs", b);
+        console.log("witness", c);
         console.log(a + b + c);
       }
     }

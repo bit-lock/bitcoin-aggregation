@@ -1,10 +1,9 @@
 import Web3Lib from "./lib/Web3Lib";
 import cron from "node-cron";
 import { bitcoinTemplateMaker } from "./lib/bitcoin/headerTemplate";
-import { bitcoinBalanceCalculation, fetchUtxos } from "./lib/bitcoin/utils";
+import { fetchUtxos } from "./lib/bitcoin/utils";
 import { inputTemplate } from "./templates/inputs";
 import { outputTemplate } from "./templates/outputs";
-import { calculateSignCount } from "./lib/utils";
 import { witnessTemplate } from "./templates/witness";
 
 const main = async () => {
@@ -21,7 +20,7 @@ const main = async () => {
       const nextProposalId = await instance.nextProposalId(vaultId);
 
       const { address, script } = bitcoinTemplateMaker(Number(vault.threshold), signatories);
-      const minimumSignatoryCount = calculateSignCount(vault, signatories);
+
       const utxos = await fetchUtxos(address);
 
       let propsalIds = [];

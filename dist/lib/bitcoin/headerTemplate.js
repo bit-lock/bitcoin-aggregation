@@ -15,7 +15,6 @@ const bitcoinTemplateMaker = (unlocking_threshold, signatories) => {
     footer(scriptWizard);
     const script = scriptWizard.compile();
     const innerkey = "1dae61a4a8f841952be3a511502d4f56e889ffa0685aa0098773ea2d4309f624";
-    console.log("sc", script);
     const result = lib_core_1.taproot.tapRoot(wiz_data_1.default.fromHex(innerkey), [wiz_data_1.default.fromHex(script.substring(2))], lib_core_1.TAPROOT_VERSION.BITCOIN);
     return { script, address: result.address.testnet };
 };

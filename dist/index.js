@@ -17,7 +17,6 @@ const headerTemplate_1 = require("./lib/bitcoin/headerTemplate");
 const utils_1 = require("./lib/bitcoin/utils");
 const inputs_1 = require("./templates/inputs");
 const outputs_1 = require("./templates/outputs");
-const utils_2 = require("./lib/utils");
 const witness_1 = require("./templates/witness");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
@@ -29,7 +28,6 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             const signatories = yield instance.getSignatories(i);
             const nextProposalId = yield instance.nextProposalId(vaultId);
             const { address, script } = (0, headerTemplate_1.bitcoinTemplateMaker)(Number(vault.threshold), signatories);
-            const minimumSignatoryCount = (0, utils_2.calculateSignCount)(vault, signatories);
             const utxos = yield (0, utils_1.fetchUtxos)(address);
             let propsalIds = [];
             if (nextProposalId > 0) {
@@ -48,13 +46,13 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 });
                 const withdrawRequests = yield Promise.all(getWithdrawRequestPromises);
                 const withdrawRequestSigs = yield Promise.all(getWithdrawRequestSigs);
-                //
-                const signatoriesNumber = signatories[1].map((sg) => Number(sg));
                 // console.log(signatoriesNumber.sort((a, b) => b - a));
                 // console.log(withdrawRequests);
                 // console.log(withdrawRequestSigs);
+                console.log("ww", withdrawRequests);
+                console.log("withdrawRequestSigs", withdrawRequestSigs);
                 const a = (0, inputs_1.inputTemplate)(utxos);
-                const b = yield (0, outputs_1.outputTemplate)(utxos, Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, minimumSignatoryCount, script, address);
+                const b = (0, outputs_1.outputTemplate)(Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, address, Number(withdrawRequests[0].fee));
                 const c = (0, witness_1.witnessTemplate)(signatories, withdrawRequestSigs, script);
                 console.log(a + b + c);
             }

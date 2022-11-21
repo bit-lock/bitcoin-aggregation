@@ -5,6 +5,7 @@ import { bitcoinBalanceCalculation, fetchUtxos } from "./lib/bitcoin/utils";
 import { inputTemplate } from "./templates/inputs";
 import { outputTemplate } from "./templates/outputs";
 import { calculateSignCount } from "./lib/utils";
+import { witnessTemplate } from "./templates/witness";
 
 const main = async () => {
   const instance = new Web3Lib();
@@ -51,8 +52,12 @@ const main = async () => {
         // console.log(signatoriesNumber.sort((a, b) => b - a));
         // console.log(withdrawRequests);
         // console.log(withdrawRequestSigs);
-        // console.log(inputTemplate(utxos));
-        // console.log(await outputTemplate(utxos, Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, minimumSignatoryCount, script, address));
+
+        const a = inputTemplate(utxos);
+        const b = await outputTemplate(utxos, Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, minimumSignatoryCount, script, address);
+        const c = witnessTemplate(signatories, withdrawRequestSigs, script);
+
+        console.log(a + b + c);
       }
     }
   }

@@ -47,14 +47,15 @@ const main = async () => {
         const withdrawRequests: any = await Promise.all(getWithdrawRequestPromises);
         const withdrawRequestSigs: string[] = await Promise.all(getWithdrawRequestSigs);
 
-        //
-        const signatoriesNumber = signatories[1].map((sg) => Number(sg));
         // console.log(signatoriesNumber.sort((a, b) => b - a));
         // console.log(withdrawRequests);
         // console.log(withdrawRequestSigs);
 
+        console.log("ww", withdrawRequests);
+        console.log("withdrawRequestSigs", withdrawRequestSigs);
+
         const a = inputTemplate(utxos);
-        const b = await outputTemplate(utxos, Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, minimumSignatoryCount, script, address);
+        const b = outputTemplate(Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, address, Number(withdrawRequests[0].fee));
         const c = witnessTemplate(signatories, withdrawRequestSigs, script);
 
         console.log(a + b + c);

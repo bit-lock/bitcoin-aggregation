@@ -15,8 +15,10 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const Web3Lib_1 = __importDefault(require("./lib/Web3Lib"));
 const headerTemplate_1 = require("./lib/bitcoin/headerTemplate");
 const utils_1 = require("./lib/bitcoin/utils");
+const inputs_1 = require("./templates/inputs");
 const outputs_1 = require("./templates/outputs");
 const utils_2 = require("./lib/utils");
+const witness_1 = require("./templates/witness");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
     const vaultLength = yield instance.getVaultLength();
@@ -51,8 +53,10 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 // console.log(signatoriesNumber.sort((a, b) => b - a));
                 // console.log(withdrawRequests);
                 // console.log(withdrawRequestSigs);
-                // console.log(inputTemplate(utxos));
-                console.log(yield (0, outputs_1.outputTemplate)(utxos, Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, minimumSignatoryCount, script, address));
+                const a = (0, inputs_1.inputTemplate)(utxos);
+                const b = yield (0, outputs_1.outputTemplate)(utxos, Number(withdrawRequests[0].amount), withdrawRequests[0].scriptPubkey, minimumSignatoryCount, script, address);
+                const c = (0, witness_1.witnessTemplate)(signatories, withdrawRequestSigs, script);
+                console.log(a + b + c);
             }
         }
     }

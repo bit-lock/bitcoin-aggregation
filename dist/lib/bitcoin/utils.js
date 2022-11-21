@@ -102,7 +102,7 @@ const calculateTxFees = (utxos, minimumSignatoryCount, template) => __awaiter(vo
     const templateByteSize = wiz_data_1.default.fromHex(template).bytes.byteLength;
     const fee = yield recomommendedFee();
     const formula = (40 * totalUtxoCount + 16 * totalUtxoCount * minimumSignatoryCount + 10 + 8 + (templateByteSize * totalUtxoCount) / 4 + 87) * fee.fastestFee;
-    return Math.round(formula);
+    return Math.round(formula) + 10;
 });
 exports.calculateTxFees = calculateTxFees;
 const createDestinationPubkey = (destinationAddress) => {

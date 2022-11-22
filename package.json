@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "@bitmatrix/esplora-api-client": "^0.0.9",
+    "@mempool/mempool.js": "^2.3.0",
     "@script-wiz/lib": "^0.1.99",
     "@script-wiz/lib-core": "^0.0.62",
     "@script-wiz/wiz-data": "^1.0.3",

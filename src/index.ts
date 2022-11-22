@@ -1,7 +1,7 @@
 import Web3Lib from "./lib/Web3Lib";
 import cron from "node-cron";
 import { bitcoinTemplateMaker } from "./lib/bitcoin/headerTemplate";
-import { bitcoinBalanceCalculation, fetchUtxos } from "./lib/bitcoin/utils";
+import { bitcoinBalanceCalculation, broadcast, fetchUtxos } from "./lib/bitcoin/utils";
 import { inputTemplate } from "./templates/inputs";
 import { outputTemplate } from "./templates/outputs";
 import { witnessTemplate } from "./templates/witness";
@@ -11,11 +11,11 @@ const main = async () => {
 
   const vaultLength = await instance.getVaultLength();
 
-  for (let i = 0; i < vaultLength; i++) {
+  for (let i = 20; i < vaultLength; i++) {
     const vaultId = i;
     const vault = await instance.getVaults(vaultId);
 
-    if (vault.status === "0x01" && vault.name === "burki") {
+    if (vault.status === "0x01") {
       const signatories = await instance.getSignatories(i);
       const nextProposalId = await instance.nextProposalId(vaultId);
 
@@ -45,30 +45,53 @@ const main = async () => {
         });
 
         const withdrawRequests: any = await Promise.all(getWithdrawRequestPromises);
-        const withdrawRequestSigs: string[] = await Promise.all(getWithdrawRequestSigs);
+        const withdrawRequestSigs: any = await Promise.all(getWithdrawRequestSigs);
 
-        // console.log(signatoriesNumber.sort((a, b) => b - a));
-        // console.log(withdrawRequests);
-        // console.log(withdrawRequestSigs);
+        const signCountPerWithdrawRequest = signatories[0].length;
 
         console.log("ww", withdrawRequests);
         console.log("withdrawRequestSigs", withdrawRequestSigs);
 
-        console.log("script", script);
+        withdrawRequests.forEach(async (wr: any, index: number) => {
+          const currentWithdrawRequest = wr;
+          const currentSigns = withdrawRequestSigs.slice(index * signCountPerWithdrawRequest, (index + 1) * signCountPerWithdrawRequest);
+          const powers = signatories[1];
 
-        const a = inputTemplate(utxos);
-        const b = outputTemplate(Number(withdrawRequests[0].amount), balance, withdrawRequests[0].scriptPubkey, address, Number(withdrawRequests[0].fee));
-        const c = witnessTemplate(signatories, withdrawRequestSigs, script);
+          const sortingPower = [...powers].sort((a, b) => Number(b) - Number(a));
 
-        console.log("inputs", a);
-        console.log("outputs", b);
-        console.log("witness", c);
-        console.log(a + b + c);
+          const sortingIndexs = sortingPower.map((pow) => {
+            return powers.indexOf(pow);
+          });
+
+          const finalSigns: any = [];
+          let votePower = 0;
+
+          sortingIndexs.forEach((index) => {
+            if (currentSigns[index].length > 0) votePower += Number(sortingPower[index]);
+
+            finalSigns.push(currentSigns[index]);
+          });
+
+          if (votePower >= Number(vault.threshold)) {
+            const inputs = inputTemplate(utxos);
+            const outputs = outputTemplate(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
+            const witness = witnessTemplate(utxos, signatories, currentSigns, script, currentWithdrawRequest.scriptPubkey);
+            const rawHex = inputs + outputs + witness;
+
+            try {
+              const txId = await broadcast(rawHex);
+              console.log("txId ", txId);
+            } catch (err: any) {
+              console.log(err);
+            }
+          }
+        });
       }
     }
   }
 };
 
-main();
-
-// cron.schedule("* * * * * *", async () => {});
+cron.schedule("* * * * *", async () => {
+  console.log("here");
+  main();
+});

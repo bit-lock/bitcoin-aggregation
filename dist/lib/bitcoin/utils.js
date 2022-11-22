@@ -31,7 +31,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.BITCOIN_PER_SATOSHI = exports.convertTo35Byte = exports.lexicographical = exports.bitcoinBalanceCalculation = exports.createDestinationPubkey = exports.calculateTxFees = exports.fetchUtxos = void 0;
+exports.broadcast = exports.BITCOIN_PER_SATOSHI = exports.convertTo35Byte = exports.lexicographical = exports.bitcoinBalanceCalculation = exports.createDestinationPubkey = exports.calculateTxFees = exports.fetchUtxos = void 0;
 const axios_1 = __importDefault(require("axios"));
 const wiz_data_1 = __importStar(require("@script-wiz/wiz-data"));
 const esplora_api_client_1 = require("@bitmatrix/esplora-api-client");
@@ -177,4 +177,17 @@ const convertTo35Byte = (hex) => {
 };
 exports.convertTo35Byte = convertTo35Byte;
 exports.BITCOIN_PER_SATOSHI = 100000000;
+const broadcast = (hex) => __awaiter(void 0, void 0, void 0, function* () {
+    const headers = {
+        "Content-Type": "text/plain;charset=utf-8",
+    };
+    return axios_1.default
+        .post("https://blockstream.info/testnet/api/tx", hex, {
+        headers,
+    })
+        .then((response) => {
+        return response.data;
+    });
+});
+exports.broadcast = broadcast;
 //# sourceMappingURL=utils.js.map

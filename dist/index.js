@@ -22,6 +22,7 @@ const witness_1 = require("./templates/witness");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
     const vaultLength = yield instance.getVaultLength();
+    console.log(vaultLength);
     for (let i = 20; i < vaultLength; i++) {
         const vaultId = i;
         const vault = yield instance.getVaults(vaultId);

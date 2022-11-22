@@ -11,7 +11,7 @@ const main = async () => {
 
   const vaultLength = await instance.getVaultLength();
 
-  for (let i = 20; i < vaultLength; i++) {
+  for (let i = 21; i < vaultLength; i++) {
     const vaultId = i;
     const vault = await instance.getVaults(vaultId);
 

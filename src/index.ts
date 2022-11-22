@@ -5,6 +5,9 @@ import { bitcoinBalanceCalculation, broadcast, fetchUtxos } from "./lib/bitcoin/
 import { inputTemplate } from "./templates/inputs";
 import { outputTemplate } from "./templates/outputs";
 import { witnessTemplate } from "./templates/witness";
+import http from "http";
+
+const port = process.env.PORT || 4000;
 
 const main = async () => {
   const instance = new Web3Lib();
@@ -90,6 +93,11 @@ const main = async () => {
     }
   }
 };
+
+const server = http.createServer();
+server.listen(port, () => {
+  console.log(`Server is running on ${port}`);
+});
 
 cron.schedule("* * * * *", async () => {
   console.log("here");

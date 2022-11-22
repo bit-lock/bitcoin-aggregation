@@ -9,4 +9,4 @@ export declare const bitcoinBalanceCalculation: (utxos: UTXO[]) => number;
 export declare const lexicographical: (aTx: string, bTx: string) => number;
 export declare const convertTo35Byte: (hex: string) => string;
 export declare const BITCOIN_PER_SATOSHI = 100000000;
-export declare const broadcast: (rawTx: string) => Promise<unknown>;
+export declare const broadcast: (hex: string) => Promise<string>;

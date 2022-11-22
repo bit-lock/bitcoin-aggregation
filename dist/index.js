@@ -13,6 +13,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Web3Lib_1 = __importDefault(require("./lib/Web3Lib"));
+const node_cron_1 = __importDefault(require("node-cron"));
 const headerTemplate_1 = require("./lib/bitcoin/headerTemplate");
 const utils_1 = require("./lib/bitcoin/utils");
 const inputs_1 = require("./templates/inputs");
@@ -21,10 +22,10 @@ const witness_1 = require("./templates/witness");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
     const vaultLength = yield instance.getVaultLength();
-    for (let i = 16; i < vaultLength; i++) {
+    for (let i = 20; i < vaultLength; i++) {
         const vaultId = i;
         const vault = yield instance.getVaults(vaultId);
-        if (vault.status === "0x01" && vault.name === "baran") {
+        if (vault.status === "0x01") {
             const signatories = yield instance.getSignatories(i);
             const nextProposalId = yield instance.nextProposalId(vaultId);
             const { address, script } = (0, headerTemplate_1.bitcoinTemplateMaker)(Number(vault.threshold), signatories);
@@ -54,30 +55,37 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                     const currentWithdrawRequest = wr;
                     const currentSigns = withdrawRequestSigs.slice(index * signCountPerWithdrawRequest, (index + 1) * signCountPerWithdrawRequest);
                     const powers = signatories[1];
-                    console.log("currentSigns", currentSigns);
                     const sortingPower = [...powers].sort((a, b) => Number(b) - Number(a));
                     const sortingIndexs = sortingPower.map((pow) => {
                         return powers.indexOf(pow);
                     });
                     const finalSigns = [];
+                    let votePower = 0;
                     sortingIndexs.forEach((index) => {
+                        if (currentSigns[index].length > 0)
+                            votePower += Number(sortingPower[index]);
                         finalSigns.push(currentSigns[index]);
                     });
-                    const inputs = (0, inputs_1.inputTemplate)(utxos);
-                    const outputs = (0, outputs_1.outputTemplate)(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
-                    const witness = (0, witness_1.witnessTemplate)(utxos, signatories, finalSigns, script);
-                    const rawHex = inputs + outputs + witness;
-                    // try {
-                    //   const txId = await broadcast(rawHex);
-                    //   console.log("txId ", txId);
-                    // } catch (err: any) {
-                    //   console.log(err);
-                    // }
+                    if (votePower >= Number(vault.threshold)) {
+                        const inputs = (0, inputs_1.inputTemplate)(utxos);
+                        const outputs = (0, outputs_1.outputTemplate)(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
+                        const witness = (0, witness_1.witnessTemplate)(utxos, signatories, currentSigns, script, currentWithdrawRequest.scriptPubkey);
+                        const rawHex = inputs + outputs + witness;
+                        try {
+                            const txId = yield (0, utils_1.broadcast)(rawHex);
+                            console.log("txId ", txId);
+                        }
+                        catch (err) {
+                            console.log(err);
+                        }
+                    }
                 }));
             }
         }
     }
 });
-main();
-// cron.schedule("* * * * * *", async () => {});
+node_cron_1.default.schedule("* * * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("here");
+    main();
+}));
 //# sourceMappingURL=index.js.map

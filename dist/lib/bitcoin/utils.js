@@ -39,7 +39,6 @@ const lib_core_1 = require("@script-wiz/lib-core");
 const bs58_1 = require("bs58");
 // @ts-ignore
 const segwit_addr_ecc_1 = __importDefault(require("./bech32/segwit_addr_ecc"));
-const mempool_js_1 = __importDefault(require("@mempool/mempool.js"));
 const recomommendedFee = () => __awaiter(void 0, void 0, void 0, function* () {
     return axios_1.default.get("https://mempool.space/api/v1/fees/recommended").then((response) => {
         return response.data;
@@ -55,7 +54,7 @@ const fetchUtxos = (address) => __awaiter(void 0, void 0, void 0, function* () {
     catch (err) {
         console.log(err);
     }
-    const confirmedTxs = allTxs;
+    const confirmedTxs = allTxs.filter((tx) => tx.status.confirmed);
     if (confirmedTxs.length > 0) {
         const myPromises = confirmedTxs.map((tx) => {
             return esplora_api_client_1.esploraClient.txOutspends(tx.txid);
@@ -178,13 +177,17 @@ const convertTo35Byte = (hex) => {
 };
 exports.convertTo35Byte = convertTo35Byte;
 exports.BITCOIN_PER_SATOSHI = 100000000;
-const broadcast = (rawTx) => __awaiter(void 0, void 0, void 0, function* () {
-    const { bitcoin: { transactions }, } = (0, mempool_js_1.default)({
-        hostname: "mempool.space",
-        network: "testnet",
+const broadcast = (hex) => __awaiter(void 0, void 0, void 0, function* () {
+    const headers = {
+        "Content-Type": "text/plain;charset=utf-8",
+    };
+    return axios_1.default
+        .post("https://blockstream.info/testnet/api/tx", hex, {
+        headers,
+    })
+        .then((response) => {
+        return response.data;
     });
-    const txid = yield transactions.postTx({ txhex: rawTx });
-    return txid;
 });
 exports.broadcast = broadcast;
 //# sourceMappingURL=utils.js.map

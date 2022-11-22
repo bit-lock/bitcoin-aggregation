@@ -28,7 +28,7 @@ export const fetchUtxos = async (address: string): Promise<UTXO[]> => {
     console.log(err);
   }
 
-  const confirmedTxs = allTxs;
+  const confirmedTxs = allTxs.filter((tx) => tx.status.confirmed);
 
   if (confirmedTxs.length > 0) {
     const myPromises = confirmedTxs.map((tx) => {
@@ -167,15 +167,15 @@ export const convertTo35Byte = (hex: string) => {
 
 export const BITCOIN_PER_SATOSHI = 100000000;
 
-export const broadcast = async (rawTx: string) => {
-  const {
-    bitcoin: { transactions },
-  } = mempoolJS({
-    hostname: "mempool.space",
-    network: "testnet",
-  });
-
-  const txid = await transactions.postTx({ txhex: rawTx });
-
-  return txid;
+export const broadcast = async (hex: string) => {
+  const headers = {
+    "Content-Type": "text/plain;charset=utf-8",
+  };
+  return axios
+    .post<string>("https://blockstream.info/testnet/api/tx", hex, {
+      headers,
+    })
+    .then((response) => {
+      return response.data;
+    });
 };

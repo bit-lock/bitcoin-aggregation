@@ -11,11 +11,11 @@ const main = async () => {
 
   const vaultLength = await instance.getVaultLength();
 
-  for (let i = 16; i < vaultLength; i++) {
+  for (let i = 20; i < vaultLength; i++) {
     const vaultId = i;
     const vault = await instance.getVaults(vaultId);
 
-    if (vault.status === "0x01" && vault.name === "baran") {
+    if (vault.status === "0x01") {
       const signatories = await instance.getSignatories(i);
       const nextProposalId = await instance.nextProposalId(vaultId);
 
@@ -63,30 +63,35 @@ const main = async () => {
             return powers.indexOf(pow);
           });
 
-          // const finalSigns: any = [];
+          const finalSigns: any = [];
+          let votePower = 0;
 
-          // sortingIndexs.forEach((index) => {
-          //   finalSigns.push(currentSigns[index]);
-          // });
+          sortingIndexs.forEach((index) => {
+            if (currentSigns[index].length > 0) votePower += Number(sortingPower[index]);
 
-          const inputs = inputTemplate(utxos);
-          const outputs = outputTemplate(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
-          const witness = witnessTemplate(utxos, signatories, currentSigns, script);
-          const rawHex = inputs + outputs + witness;
+            finalSigns.push(currentSigns[index]);
+          });
 
-          // try {
-          //   const txId = await broadcast(rawHex);
+          if (votePower >= Number(vault.threshold)) {
+            const inputs = inputTemplate(utxos);
+            const outputs = outputTemplate(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
+            const witness = witnessTemplate(utxos, signatories, currentSigns, script, currentWithdrawRequest.scriptPubkey);
+            const rawHex = inputs + outputs + witness;
 
-          //   console.log("txId ", txId);
-          // } catch (err: any) {
-          //   console.log(err);
-          // }
+            try {
+              const txId = await broadcast(rawHex);
+              console.log("txId ", txId);
+            } catch (err: any) {
+              console.log(err);
+            }
+          }
         });
       }
     }
   }
 };
 
-main();
-
-// cron.schedule("* * * * * *", async () => {});
+cron.schedule("* * * * *", async () => {
+  console.log("here");
+  main();
+});

@@ -23,10 +23,11 @@ exports.inputTemplate = void 0;
 const wiz_data_1 = __importStar(require("@script-wiz/wiz-data"));
 const inputTemplate = (utxo) => {
     let first = "020000000001";
-    let utxoArray = utxo.map((u) => {
-        return (0, wiz_data_1.hexLE)(u.txId) + u.vout + "0000000000";
+    let utxoData = "";
+    utxo.forEach((u) => {
+        utxoData += (0, wiz_data_1.hexLE)(u.txId) + u.vout + "0000000000";
     });
-    return first + wiz_data_1.default.fromNumber(utxo.length).hex + utxoArray;
+    return first + wiz_data_1.default.fromNumber(utxo.length).hex + utxoData;
 };
 exports.inputTemplate = inputTemplate;
 //# sourceMappingURL=inputs.js.map

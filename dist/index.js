@@ -21,10 +21,10 @@ const witness_1 = require("./templates/witness");
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
     const vaultLength = yield instance.getVaultLength();
-    for (let i = 0; i < vaultLength; i++) {
+    for (let i = 16; i < vaultLength; i++) {
         const vaultId = i;
         const vault = yield instance.getVaults(vaultId);
-        if (vault.status === "0x01" && vault.name === "burki") {
+        if (vault.status === "0x01" && vault.name === "baran") {
             const signatories = yield instance.getSignatories(i);
             const nextProposalId = yield instance.nextProposalId(vaultId);
             const { address, script } = (0, headerTemplate_1.bitcoinTemplateMaker)(Number(vault.threshold), signatories);
@@ -47,19 +47,33 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 });
                 const withdrawRequests = yield Promise.all(getWithdrawRequestPromises);
                 const withdrawRequestSigs = yield Promise.all(getWithdrawRequestSigs);
-                // console.log(signatoriesNumber.sort((a, b) => b - a));
-                // console.log(withdrawRequests);
-                // console.log(withdrawRequestSigs);
+                const signCountPerWithdrawRequest = signatories[0].length;
                 console.log("ww", withdrawRequests);
                 console.log("withdrawRequestSigs", withdrawRequestSigs);
-                console.log("script", script);
-                const a = (0, inputs_1.inputTemplate)(utxos);
-                const b = (0, outputs_1.outputTemplate)(Number(withdrawRequests[0].amount), balance, withdrawRequests[0].scriptPubkey, address, Number(withdrawRequests[0].fee));
-                const c = (0, witness_1.witnessTemplate)(signatories, withdrawRequestSigs, script);
-                console.log("inputs", a);
-                console.log("outputs", b);
-                console.log("witness", c);
-                console.log(a + b + c);
+                withdrawRequests.forEach((wr, index) => __awaiter(void 0, void 0, void 0, function* () {
+                    const currentWithdrawRequest = wr;
+                    const currentSigns = withdrawRequestSigs.slice(index * signCountPerWithdrawRequest, (index + 1) * signCountPerWithdrawRequest);
+                    const powers = signatories[1];
+                    console.log("currentSigns", currentSigns);
+                    const sortingPower = [...powers].sort((a, b) => Number(b) - Number(a));
+                    const sortingIndexs = sortingPower.map((pow) => {
+                        return powers.indexOf(pow);
+                    });
+                    const finalSigns = [];
+                    sortingIndexs.forEach((index) => {
+                        finalSigns.push(currentSigns[index]);
+                    });
+                    const inputs = (0, inputs_1.inputTemplate)(utxos);
+                    const outputs = (0, outputs_1.outputTemplate)(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
+                    const witness = (0, witness_1.witnessTemplate)(utxos, signatories, finalSigns, script);
+                    const rawHex = inputs + outputs + witness;
+                    // try {
+                    //   const txId = await broadcast(rawHex);
+                    //   console.log("txId ", txId);
+                    // } catch (err: any) {
+                    //   console.log(err);
+                    // }
+                }));
             }
         }
     }

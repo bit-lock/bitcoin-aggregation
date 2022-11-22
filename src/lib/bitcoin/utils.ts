@@ -8,6 +8,7 @@ import { utils, arithmetics64, convertion, crypto } from "@script-wiz/lib-core";
 import { decode } from "bs58";
 // @ts-ignore
 import segwit_addr_ecc from "./bech32/segwit_addr_ecc";
+import mempoolJS from "@mempool/mempool.js";
 
 const recomommendedFee = async () => {
   return axios.get<RecommendedFee>("https://mempool.space/api/v1/fees/recommended").then((response) => {
@@ -165,3 +166,16 @@ export const convertTo35Byte = (hex: string) => {
 };
 
 export const BITCOIN_PER_SATOSHI = 100000000;
+
+export const broadcast = async (rawTx: string) => {
+  const {
+    bitcoin: { transactions },
+  } = mempoolJS({
+    hostname: "mempool.space",
+    network: "testnet",
+  });
+
+  const txid = await transactions.postTx({ txhex: rawTx });
+
+  return txid;
+};

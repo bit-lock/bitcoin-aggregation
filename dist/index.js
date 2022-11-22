@@ -24,7 +24,7 @@ const port = process.env.PORT || 4000;
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
     const vaultLength = yield instance.getVaultLength();
-    for (let i = 21; i < vaultLength; i++) {
+    for (let i = 22; i < vaultLength; i++) {
         const vaultId = i;
         const vault = yield instance.getVaults(vaultId);
         if (vault.status === "0x01") {

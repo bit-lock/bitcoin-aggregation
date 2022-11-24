@@ -1,4 +1,4 @@
-export type DegradingPeriod = {
+export declare type DegradingPeriod = {
     date: {
         value: number;
         unit: string;

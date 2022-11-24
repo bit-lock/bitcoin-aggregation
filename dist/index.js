@@ -19,8 +19,12 @@ const utils_1 = require("./lib/bitcoin/utils");
 const inputs_1 = require("./templates/inputs");
 const outputs_1 = require("./templates/outputs");
 const witness_1 = require("./templates/witness");
-const http_1 = __importDefault(require("http"));
-const port = process.env.PORT || 4000;
+const express_1 = __importDefault(require("express"));
+const app = (0, express_1.default)();
+app.get("/", function (req, res) {
+    res.send("Welcome to bitlock aggreagation");
+});
+app.listen(process.env.PORT || 3000);
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
     const vaultLength = yield instance.getVaultLength();
@@ -85,10 +89,6 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
             }
         }
     }
-});
-const server = http_1.default.createServer();
-server.listen(port, () => {
-    console.log(`Server is running on ${port}`);
 });
 node_cron_1.default.schedule("* * * * *", () => __awaiter(void 0, void 0, void 0, function* () {
     console.log("here");

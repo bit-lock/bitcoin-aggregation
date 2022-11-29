@@ -11,7 +11,7 @@ import segwit_addr_ecc from "./bech32/segwit_addr_ecc";
 import mempoolJS from "@mempool/mempool.js";
 
 const recomommendedFee = async () => {
-  return axios.get<RecommendedFee>("https://mempool.space/api/v1/fees/recommended").then((response) => {
+  return axios.get<RecommendedFee>("https://mempool.space/testnet/api/v1/fees/recommended").then((response) => {
     return response.data;
   });
 };

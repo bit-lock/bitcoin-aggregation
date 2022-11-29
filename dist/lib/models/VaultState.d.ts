@@ -1,7 +1,7 @@
 import { Signatories } from "./Signatories";
 import { UTXO } from "./UTXO";
 import { Vault } from "./Vault";
-export declare type VaultState = {
+export type VaultState = {
     id: number;
     isMyOwner: boolean;
     signatories: Signatories;

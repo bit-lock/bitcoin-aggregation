@@ -1,7 +1,11 @@
 "use strict";
 var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
 }) : (function(o, m, k, k2) {
     if (k2 === undefined) k2 = k;
     o[k2] = m[k];
@@ -40,7 +44,7 @@ const bs58_1 = require("bs58");
 // @ts-ignore
 const segwit_addr_ecc_1 = __importDefault(require("./bech32/segwit_addr_ecc"));
 const recomommendedFee = () => __awaiter(void 0, void 0, void 0, function* () {
-    return axios_1.default.get("https://mempool.space/api/v1/fees/recommended").then((response) => {
+    return axios_1.default.get("https://mempool.space/testnet/api/v1/fees/recommended").then((response) => {
         return response.data;
     });
 });

@@ -1,4 +1,4 @@
-export declare type Vault = {
+export type Vault = {
     initiator: string;
     name: string;
     status: string;

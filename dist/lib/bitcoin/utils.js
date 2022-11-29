@@ -58,7 +58,7 @@ const fetchUtxos = (address) => __awaiter(void 0, void 0, void 0, function* () {
     catch (err) {
         console.log(err);
     }
-    const confirmedTxs = allTxs.filter((tx) => tx.status.confirmed);
+    const confirmedTxs = allTxs;
     if (confirmedTxs.length > 0) {
         const myPromises = confirmedTxs.map((tx) => {
             return esplora_api_client_1.esploraClient.txOutspends(tx.txid);

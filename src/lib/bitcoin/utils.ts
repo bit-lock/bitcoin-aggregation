@@ -11,7 +11,7 @@ import segwit_addr_ecc from "./bech32/segwit_addr_ecc";
 import mempoolJS from "@mempool/mempool.js";
 
 const recomommendedFee = async () => {
-  return axios.get<RecommendedFee>("https://mempool.space/testnet/api/v1/fees/recommended").then((response) => {
+  return axios.get<RecommendedFee>("https://mempool.space/api/v1/fees/recommended").then((response) => {
     return response.data;
   });
 };
@@ -28,7 +28,7 @@ export const fetchUtxos = async (address: string): Promise<UTXO[]> => {
     console.log(err);
   }
 
-  const confirmedTxs = allTxs.filter((tx) => tx.status.confirmed);
+  const confirmedTxs = allTxs;
 
   if (confirmedTxs.length > 0) {
     const myPromises = confirmedTxs.map((tx) => {

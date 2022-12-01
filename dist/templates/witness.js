@@ -11,7 +11,8 @@ const witnessTemplate = (utxo, signatories, sigs, script, address) => {
     const numberOfWitnessElements = wiz_data_1.default.fromNumber(signatories[0].length + 3).hex;
     const degregadingPeriodIndex = lib_core_1.utils.compactSizeVarIntData("01");
     const scriptCompact = lib_core_1.utils.compactSizeVarIntData(script.substring(2));
-    const tapTweakPrefix = lib_core_1.taproot.tapRoot(wiz_data_1.default.fromHex(innerKey), [wiz_data_1.default.fromHex(address.substring(2))], lib_core_1.TAPROOT_VERSION.BITCOIN).tweak.hex.substring(0, 2) === "02" ? "c0" : "c1";
+    console.log(address);
+    const tapTweakPrefix = lib_core_1.taproot.tapRoot(wiz_data_1.default.fromHex(innerKey), [wiz_data_1.default.fromHex(address)], lib_core_1.TAPROOT_VERSION.BITCOIN).tweak.hex.substring(0, 2) === "02" ? "c0" : "c1";
     let final = "";
     utxo.forEach((ut, index) => {
         // higher -> lower

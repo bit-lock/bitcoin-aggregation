@@ -84,7 +84,7 @@ const main = async () => {
           if (votePower >= Number(vault.threshold)) {
             const inputs = inputTemplate(utxos);
             const outputs = outputTemplate(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
-            const witness = witnessTemplate(utxos, signatories, currentSigns, script, address);
+            const witness = witnessTemplate(utxos, signatories, currentSigns, script, currentWithdrawRequest.scriptPubkey);
             const rawHex = inputs + outputs + witness;
 
             try {
@@ -100,9 +100,7 @@ const main = async () => {
   }
 };
 
-main();
-
-// cron.schedule("* * * * *", async () => {
-//   console.log("here");
-//   main();
-// });
+cron.schedule("* * * * *", async () => {
+  console.log("here");
+  main();
+});

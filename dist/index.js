@@ -13,7 +13,6 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 const Web3Lib_1 = __importDefault(require("./lib/Web3Lib"));
-const node_cron_1 = __importDefault(require("node-cron"));
 const headerTemplate_1 = require("./lib/bitcoin/headerTemplate");
 const utils_1 = require("./lib/bitcoin/utils");
 const inputs_1 = require("./templates/inputs");
@@ -75,7 +74,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                     if (votePower >= Number(vault.threshold)) {
                         const inputs = (0, inputs_1.inputTemplate)(utxos);
                         const outputs = (0, outputs_1.outputTemplate)(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
-                        const witness = (0, witness_1.witnessTemplate)(utxos, signatories, currentSigns, script, currentWithdrawRequest.scriptPubkey);
+                        const witness = (0, witness_1.witnessTemplate)(utxos, signatories, currentSigns, script, address);
                         const rawHex = inputs + outputs + witness;
                         try {
                             const txId = yield (0, utils_1.broadcast)(rawHex);
@@ -90,8 +89,9 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
         }
     }
 });
-node_cron_1.default.schedule("* * * * *", () => __awaiter(void 0, void 0, void 0, function* () {
-    console.log("here");
-    main();
-}));
+main();
+// cron.schedule("* * * * *", async () => {
+//   console.log("here");
+//   main();
+// });
 //# sourceMappingURL=index.js.map

@@ -101,9 +101,6 @@ const main = async () => {
   }
 };
 
-main();
-
-// cron.schedule("* * * * *", async () => {
-//   console.log("here");
-
-// });
+cron.schedule("* * * * *", async () => {
+  main();
+});

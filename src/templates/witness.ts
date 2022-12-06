@@ -11,9 +11,8 @@ export const witnessTemplate = (utxo: UTXO[], signatories: Signatories, sigs: st
 
   const scriptCompact = utils.compactSizeVarIntData(script.substring(2));
 
-  console.log(address);
-
-  const tapTweakPrefix = taproot.tapRoot(WizData.fromHex(innerKey), [WizData.fromHex(address)], TAPROOT_VERSION.BITCOIN).tweak.hex.substring(0, 2) === "02" ? "c0" : "c1";
+  const tapTweakPrefix =
+    taproot.tapRoot(WizData.fromHex(innerKey), [WizData.fromHex(address.substring(2))], TAPROOT_VERSION.BITCOIN).tweak.hex.substring(0, 2) === "02" ? "c0" : "c1";
 
   let final = "";
   utxo.forEach((ut, index) => {

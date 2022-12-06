@@ -91,6 +91,7 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
     }
 });
 node_cron_1.default.schedule("* * * * *", () => __awaiter(void 0, void 0, void 0, function* () {
+    console.log("program is running");
     main();
 }));
 //# sourceMappingURL=index.js.map

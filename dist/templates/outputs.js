@@ -11,7 +11,10 @@ const outputTemplate = (amount, balance, destinationScriptPubkey, address, fee) 
     const first = "02";
     const balanceSats = balance * utils_1.BITCOIN_PER_SATOSHI;
     const amount64 = lib_core_1.convertion.numToLE64(wiz_data_1.default.fromNumber(amount)).hex;
-    const compactDestinationScriptPubkey = destinationScriptPubkey.substring(2);
+    let compactDestinationScriptPubkey = destinationScriptPubkey.substring(2);
+    if (compactDestinationScriptPubkey.startsWith("16")) {
+        compactDestinationScriptPubkey = compactDestinationScriptPubkey.substring(0, 46);
+    }
     const changeAmountNumber = balanceSats - amount - fee;
     const changeAmount = lib_core_1.convertion.numToLE64(wiz_data_1.default.fromNumber(changeAmountNumber)).hex;
     const vaultScriptPubkey = lib_core_1.utils.compactSizeVarIntData((0, utils_1.createDestinationPubkey)(address).scriptPubkey);

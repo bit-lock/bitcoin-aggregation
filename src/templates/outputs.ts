@@ -8,7 +8,11 @@ export const outputTemplate = (amount: number, balance: number, destinationScrip
 
   const amount64 = convertion.numToLE64(WizData.fromNumber(amount)).hex;
 
-  const compactDestinationScriptPubkey = destinationScriptPubkey.substring(2);
+  let compactDestinationScriptPubkey = destinationScriptPubkey.substring(2);
+
+  if (compactDestinationScriptPubkey.startsWith("16")) {
+    compactDestinationScriptPubkey = compactDestinationScriptPubkey.substring(0, 46);
+  }
 
   const changeAmountNumber = balanceSats - amount - fee;
 

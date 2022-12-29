@@ -1,3 +1,3 @@
-export declare type AuthorizedAddresses = {
+export type AuthorizedAddresses = {
     address: string;
 };

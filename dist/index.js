@@ -24,11 +24,11 @@ const app = (0, express_1.default)();
 app.get("/", function (req, res) {
     res.send("Welcome to bitlock aggreagation");
 });
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 3001);
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
     const vaultLength = yield instance.getVaultLength();
-    for (let i = 29; i < vaultLength; i++) {
+    for (let i = 33; i < vaultLength; i++) {
         const vaultId = i;
         const vault = yield instance.getVaults(vaultId);
         if (vault.status === "0x01") {

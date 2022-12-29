@@ -13,14 +13,14 @@ app.get("/", function (req: any, res: any) {
   res.send("Welcome to bitlock aggreagation");
 });
 
-app.listen(process.env.PORT || 3000);
+app.listen(process.env.PORT || 3001);
 
 const main = async () => {
   const instance = new Web3Lib();
 
   const vaultLength = await instance.getVaultLength();
 
-  for (let i = 29; i < vaultLength; i++) {
+  for (let i = 33; i < vaultLength; i++) {
     const vaultId = i;
     const vault = await instance.getVaults(vaultId);
 

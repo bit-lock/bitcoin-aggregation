@@ -1,4 +1,4 @@
-export declare type UTXO = {
+export type UTXO = {
     txId: string;
     vout: string;
     value: number;

@@ -1,4 +1,4 @@
-export declare type TimelockThreshold = {
+export type TimelockThreshold = {
     timelock: number;
     threshold: number;
 };

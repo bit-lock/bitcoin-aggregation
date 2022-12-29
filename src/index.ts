@@ -20,7 +20,7 @@ const main = async () => {
 
   const vaultLength = await instance.getVaultLength();
 
-  for (let i = 22; i < vaultLength; i++) {
+  for (let i = 29; i < vaultLength; i++) {
     const vaultId = i;
     const vault = await instance.getVaults(vaultId);
 
@@ -58,9 +58,6 @@ const main = async () => {
 
         const signCountPerWithdrawRequest = signatories[0].length;
 
-        console.log("ww", withdrawRequests);
-        console.log("withdrawRequestSigs", withdrawRequestSigs);
-
         withdrawRequests.forEach(async (wr: any, index: number) => {
           const currentWithdrawRequest = wr;
           const currentSigns = withdrawRequestSigs.slice(index * signCountPerWithdrawRequest, (index + 1) * signCountPerWithdrawRequest);
@@ -85,14 +82,15 @@ const main = async () => {
             const inputs = inputTemplate(utxos);
             const outputs = outputTemplate(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
 
-            const witness = witnessTemplate(utxos, signatories, currentSigns, script, currentWithdrawRequest.scriptPubkey);
+            const witness = witnessTemplate(utxos, signatories, currentSigns, script);
             const rawHex = inputs + outputs + witness;
+            console.log(rawHex);
 
             try {
               const txId = await broadcast(rawHex);
               console.log("txId ", txId);
             } catch (err: any) {
-              console.log(err);
+              // console.log(err);
             }
           }
         });
@@ -105,3 +103,4 @@ cron.schedule("* * * * *", async () => {
   console.log("program is running");
   main();
 });
+// main();

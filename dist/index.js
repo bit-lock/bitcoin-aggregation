@@ -28,7 +28,7 @@ app.listen(process.env.PORT || 3000);
 const main = () => __awaiter(void 0, void 0, void 0, function* () {
     const instance = new Web3Lib_1.default();
     const vaultLength = yield instance.getVaultLength();
-    for (let i = 22; i < vaultLength; i++) {
+    for (let i = 29; i < vaultLength; i++) {
         const vaultId = i;
         const vault = yield instance.getVaults(vaultId);
         if (vault.status === "0x01") {
@@ -55,8 +55,6 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                 const withdrawRequests = yield Promise.all(getWithdrawRequestPromises);
                 const withdrawRequestSigs = yield Promise.all(getWithdrawRequestSigs);
                 const signCountPerWithdrawRequest = signatories[0].length;
-                console.log("ww", withdrawRequests);
-                console.log("withdrawRequestSigs", withdrawRequestSigs);
                 withdrawRequests.forEach((wr, index) => __awaiter(void 0, void 0, void 0, function* () {
                     const currentWithdrawRequest = wr;
                     const currentSigns = withdrawRequestSigs.slice(index * signCountPerWithdrawRequest, (index + 1) * signCountPerWithdrawRequest);
@@ -75,14 +73,15 @@ const main = () => __awaiter(void 0, void 0, void 0, function* () {
                     if (votePower >= Number(vault.threshold)) {
                         const inputs = (0, inputs_1.inputTemplate)(utxos);
                         const outputs = (0, outputs_1.outputTemplate)(Number(currentWithdrawRequest.amount), balance, currentWithdrawRequest.scriptPubkey, address, Number(currentWithdrawRequest.fee));
-                        const witness = (0, witness_1.witnessTemplate)(utxos, signatories, currentSigns, script, currentWithdrawRequest.scriptPubkey);
+                        const witness = (0, witness_1.witnessTemplate)(utxos, signatories, currentSigns, script);
                         const rawHex = inputs + outputs + witness;
+                        console.log(rawHex);
                         try {
                             const txId = yield (0, utils_1.broadcast)(rawHex);
                             console.log("txId ", txId);
                         }
                         catch (err) {
-                            console.log(err);
+                            // console.log(err);
                         }
                     }
                 }));
@@ -94,4 +93,5 @@ node_cron_1.default.schedule("* * * * *", () => __awaiter(void 0, void 0, void 0
     console.log("program is running");
     main();
 }));
+// main();
 //# sourceMappingURL=index.js.map

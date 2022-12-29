@@ -1,5 +1,5 @@
 import { Vault } from "./Vault";
-export type VaultContract = Vault & {
+export declare type VaultContract = Vault & {
     0: string;
     1: string;
     2: string;

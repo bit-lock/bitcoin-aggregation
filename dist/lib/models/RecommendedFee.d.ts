@@ -1,4 +1,4 @@
-export type RecommendedFee = {
+export declare type RecommendedFee = {
     fastestFee: number;
     halfHourFee: number;
     hourFee: number;

@@ -1,4 +1,4 @@
-export type Signatories = {
+export declare type Signatories = {
     0: string[];
     1: string[];
     2: string[];

@@ -35,7 +35,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.broadcast = exports.BITCOIN_PER_SATOSHI = exports.convertTo35Byte = exports.lexicographical = exports.bitcoinBalanceCalculation = exports.createDestinationPubkey = exports.calculateTxFees = exports.fetchUtxos = void 0;
+exports.broadcast = exports.BITCOIN_PER_SATOSHI = exports.convertTo35Byte = exports.lexicographical = exports.bitcoinBalanceCalculation = exports.createDestinationPubkey = exports.fetchUtxos = void 0;
 const axios_1 = __importDefault(require("axios"));
 const wiz_data_1 = __importStar(require("@script-wiz/wiz-data"));
 const esplora_api_client_1 = require("@bitmatrix/esplora-api-client");
@@ -43,11 +43,6 @@ const lib_core_1 = require("@script-wiz/lib-core");
 const bs58_1 = require("bs58");
 // @ts-ignore
 const segwit_addr_ecc_1 = __importDefault(require("./bech32/segwit_addr_ecc"));
-const recomommendedFee = () => __awaiter(void 0, void 0, void 0, function* () {
-    return axios_1.default.get("https://mempool.space/api/v1/fees/recommended").then((response) => {
-        return response.data;
-    });
-});
 const fetchUtxos = (address) => __awaiter(void 0, void 0, void 0, function* () {
     (0, esplora_api_client_1.init)("https://blockstream.info/testnet/api");
     let myUtxoSets = [];
@@ -101,14 +96,6 @@ const fetchUtxos = (address) => __awaiter(void 0, void 0, void 0, function* () {
     return myUtxoSets;
 });
 exports.fetchUtxos = fetchUtxos;
-const calculateTxFees = (utxos, minimumSignatoryCount, template) => __awaiter(void 0, void 0, void 0, function* () {
-    const totalUtxoCount = utxos.length;
-    const templateByteSize = wiz_data_1.default.fromHex(template).bytes.byteLength;
-    const fee = yield recomommendedFee();
-    const formula = (40 * totalUtxoCount + 16 * totalUtxoCount * minimumSignatoryCount + 10 + 8 + (templateByteSize * totalUtxoCount) / 4 + 87) * fee.fastestFee;
-    return Math.round(formula) + 10;
-});
-exports.calculateTxFees = calculateTxFees;
 const createDestinationPubkey = (destinationAddress) => {
     if (destinationAddress === "")
         return { errorMessage: "", scriptPubkey: "" };

@@ -1,6 +1,5 @@
 import { UTXO } from "../models/UTXO";
 export declare const fetchUtxos: (address: string) => Promise<UTXO[]>;
-export declare const calculateTxFees: (utxos: UTXO[], minimumSignatoryCount: number, template: string) => Promise<number>;
 export declare const createDestinationPubkey: (destinationAddress: string) => {
     errorMessage: string;
     scriptPubkey: string;

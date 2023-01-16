@@ -1,20 +1,12 @@
 /* eslint-disable array-callback-return */
 import { UTXO } from "../models/UTXO";
 import axios from "axios";
-import { RecommendedFee } from "../models/RecommendedFee";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { esploraClient, init, TxDetail } from "@bitmatrix/esplora-api-client";
 import { utils, arithmetics64, convertion, crypto } from "@script-wiz/lib-core";
 import { decode } from "bs58";
 // @ts-ignore
 import segwit_addr_ecc from "./bech32/segwit_addr_ecc";
-import mempoolJS from "@mempool/mempool.js";
-
-const recomommendedFee = async () => {
-  return axios.get<RecommendedFee>("https://mempool.space/api/v1/fees/recommended").then((response) => {
-    return response.data;
-  });
-};
 
 export const fetchUtxos = async (address: string): Promise<UTXO[]> => {
   init("https://blockstream.info/testnet/api");
@@ -78,16 +70,6 @@ export const fetchUtxos = async (address: string): Promise<UTXO[]> => {
   }
 
   return myUtxoSets;
-};
-
-export const calculateTxFees = async (utxos: UTXO[], minimumSignatoryCount: number, template: string) => {
-  const totalUtxoCount = utxos.length;
-  const templateByteSize = WizData.fromHex(template).bytes.byteLength;
-  const fee = await recomommendedFee();
-
-  const formula = (40 * totalUtxoCount + 16 * totalUtxoCount * minimumSignatoryCount + 10 + 8 + (templateByteSize * totalUtxoCount) / 4 + 87) * fee.fastestFee;
-
-  return Math.round(formula) + 10;
 };
 
 export const createDestinationPubkey = (destinationAddress: string) => {

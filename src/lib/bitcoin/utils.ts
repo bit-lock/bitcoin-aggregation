@@ -1,7 +1,6 @@
 /* eslint-disable array-callback-return */
 import { UTXO } from "../models/UTXO";
 import axios from "axios";
-import { RecommendedFee } from "../models/RecommendedFee";
 import WizData, { hexLE } from "@script-wiz/wiz-data";
 import { esploraClient, init, TxDetail } from "@bitmatrix/esplora-api-client";
 import { utils, arithmetics64, convertion, crypto } from "@script-wiz/lib-core";
